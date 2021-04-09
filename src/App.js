@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState } from "react";
+import React from "react";
 
 import PriceChart from "./components/priceCart";
 

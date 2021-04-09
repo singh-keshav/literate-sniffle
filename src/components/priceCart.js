@@ -3,6 +3,12 @@ import Chart from "chart.js/auto";
 
 import styles from "./priceCart.module.css";
 
+function formatDate(date = new Date()) {
+  return `${date.getFullYear()}-${date
+    .getMonth()
+    .toString()
+    .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+}
 
 async function fetchApiData(curr, start, end) {
   const res = await fetch(
@@ -67,39 +73,40 @@ async function initChart(ctx, curr, start, end) {
   chart = new Chart(ctx, config);
 }
 
-
-
 function PriceChart() {
   const canvasRef = useRef(null);
 
   const [currency, setCurrency] = useState("EUR");
-  const [start, setStart] = useState("2013-09-01");
-  const [end, setEnd] = useState("2013-09-10");
 
-//   const [currentVaule, setCurrentVaule] = useState({});
+  const [currenValue, setCurrenValue] = useState("");
 
   useEffect(() => {
-    //TODO: initialise chart.js
     if (!canvasRef.current) return;
 
     const ctx = canvasRef.current.getContext("2d");
 
-    initChart(ctx, currency, start, end);
+    const end = formatDate();
+    const start = formatDate(new Date(Date.now() - 60 * 24 * 60 * 60 * 1000));
 
+    initChart(ctx, currency, start, end);
+    fetch(`https://api.coindesk.com/v1/bpi/currentprice.json`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        setCurrenValue(res.bpi[currency].rate);
+      });
 
     return () => {
       chart.destroy();
     };
-  }, [currency, end, start]);
-
-  
+  }, [currency]);
 
   return (
     <div className={styles.container}>
       <div className={styles.selector}>
         <p>1 bitcoin equals</p>
         <select
-          className
           value={currency}
           onChange={(e) => {
             setCurrency(e.target.value);
@@ -109,7 +116,7 @@ function PriceChart() {
           <option value="USD"> USD</option>
           <option value="GBP"> GBP</option>
         </select>
-       
+        <p>current value is {currenValue}</p>
       </div>
 
       <canvas
