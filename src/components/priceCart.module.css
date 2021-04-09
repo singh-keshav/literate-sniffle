@@ -1,0 +1,19 @@
+.container {
+  height: 350px;
+  width: auto;
+  border-color: red;
+  border-width: 10px;
+  position: absolute;
+}
+
+.selector {
+  height: 300px;
+  width: 300px;
+  display: inline-block;
+}
+
+.canvaas {
+  height: 300px !important;
+  width: 300px !important;
+  float: right;
+}
