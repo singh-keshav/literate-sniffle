@@ -10,6 +10,12 @@ function formatDate(date = new Date()) {
     .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
 }
 
+function datePrototype(date = new Date()) {
+  return `${date.getDate().toString()} ${date.toLocaleString("en-us", {
+    month: "short",
+  })}`;
+}
+
 async function fetchApiData(curr, start, end) {
   const res = await fetch(
     `https://api.coindesk.com/v1/bpi/historical/close.json?currency=${curr}&start=${start}&end=${end}`
@@ -23,9 +29,9 @@ function apiToChartData(res) {
       {
         label: "price",
         data: [],
-        borderColor: "rgba(255,0,0,0.8)",
-        backgroundColor: "rgba(255,0,0,0.25)",
-        fill: true,
+        borderColor: "rgb(0, 255, 20)",
+        backgroundColor: "rgba(0, 255, 0,0.10)",
+        fill: "origin",
       },
     ],
   };
@@ -43,17 +49,20 @@ async function initChart(ctx, curr, start, end) {
   }
   const apiData = await fetchApiData(curr, start, end);
 
+
   const config = {
     type: "line",
     data: apiToChartData(apiData),
     options: {
+      responsive: true,
       plugins: {
         filler: {
           propagate: false,
         },
         title: {
           display: true,
-          text: (ctx) => "Fill: " + ctx.chart.data.datasets[0].fill,
+          text: "Last 60 days trend",
+          font: { size: "40px" },
         },
         legend: {
           fullSize: true,
@@ -65,6 +74,28 @@ async function initChart(ctx, curr, start, end) {
       elements: {
         line: {
           tension: 0.4,
+        },
+      },
+      scales: {
+        y: {
+          ticks: {
+            callback: function (value, index, values) {
+              return index % 2 === 0 ? value : "";
+            },
+            font: { size: "35px" },
+          },
+        },
+        x: {
+          ticks: {
+            callback: function (value, index, values) {
+              return index % 30 === 0 && index !== 0
+                ? datePrototype(
+                    new Date(Date.now() - index * 24 * 60 * 60 * 1000)
+                  )
+                : "";
+            },
+            font: { size: "30px" },
+          },
         },
       },
     },
@@ -105,8 +136,9 @@ function PriceChart() {
   return (
     <div className={styles.container}>
       <div className={styles.selector}>
-        <p>1 bitcoin equals</p>
+        <p style={{ textAlign: "left" }}>1 Bitcoin equals</p>
         <select
+          className={styles.select}
           value={currency}
           onChange={(e) => {
             setCurrency(e.target.value);
@@ -116,7 +148,13 @@ function PriceChart() {
           <option value="USD"> USD</option>
           <option value="GBP"> GBP</option>
         </select>
-        <p>current value is {currenValue}</p>
+        <h1
+          style={{ textAlign: "left", marginBlock: "0px", marginTop: "50px" }}
+        >
+          {" "}
+          {currenValue}
+        </h1>
+        <h1 style={{ textAlign: "left", marginBlock: "0px" }}> {currency}</h1>
       </div>
 
       <canvas

@@ -1,9 +1,14 @@
 .container {
-  height: 350px;
+  height: 220px;
   width: auto;
   border-color: red;
   border-width: 10px;
   position: absolute;
+  background-color: rgb(235, 217, 217);
+  margin: 40px;
+  border-radius: 15px;
+  box-shadow: 10px 10px 5px 0px rgb(0 0 0 / 75%);
+  padding:30px;
 }
 
 .selector {
@@ -13,7 +18,14 @@
 }
 
 .canvaas {
-  height: 300px !important;
-  width: 300px !important;
+  height: 200px !important;
+  width: 350px !important;
   float: right;
+}
+
+.select{
+  width:150px;
+  border-radius: 4px;
+  background-color: white;
+  float:left;
 }
