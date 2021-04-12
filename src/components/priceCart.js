@@ -4,13 +4,13 @@ import Chart from "chart.js/auto";
 import styles from "./priceCart.module.css";
 
 function formatDate(date = new Date()) {
-  return `${date.getFullYear()}-${date
-    .getMonth()
+  return `${date.getFullYear()}-${(date.getMonth() + 1)
     .toString()
     .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
 }
 
-function datePrototype(date = new Date()) {
+function datePrototype(date) {
+  date = new Date(date);
   return `${date.getDate().toString()} ${date.toLocaleString("en-us", {
     month: "short",
   })}`;
@@ -38,6 +38,8 @@ function apiToChartData(res) {
   for (const date in res.bpi) {
     result.datasets[0].data.push({ x: date, y: res.bpi[date] });
   }
+  result.datasets[0].data.sort((a, b) => b.x - a.x);
+  console.log(result.datasets[0].data);
   return result;
 }
 
@@ -48,7 +50,6 @@ async function initChart(ctx, curr, start, end) {
     chart.destroy();
   }
   const apiData = await fetchApiData(curr, start, end);
-
 
   const config = {
     type: "line",
@@ -88,10 +89,9 @@ async function initChart(ctx, curr, start, end) {
         x: {
           ticks: {
             callback: function (value, index, values) {
-              return index % 30 === 0 && index !== 0
-                ? datePrototype(
-                    new Date(Date.now() - index * 24 * 60 * 60 * 1000)
-                  )
+              console.log(value, index, this.getLabelForValue(value));
+              return index===30
+                ? datePrototype(this.getLabelForValue(value))
                 : "";
             },
             font: { size: "30px" },
